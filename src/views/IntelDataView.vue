@@ -2,11 +2,7 @@
 <template>
   <!-- 使用ant-design-vue的布局 -->
   <a-row>
-    <a-col :span="24">
-      <a-table :columns="columns" :data-source="data">
-        <!-- <template #title>遥感情报信息列表</template> -->
-      </a-table>
-    </a-col>
+    <a-col :span="24"> </a-col>
   </a-row>
 
   <a-row>
@@ -37,7 +33,7 @@
 </template>
 
 <script lang="ts" setup name="IntelDataView">
-import MapContainer from '@/components/MapContainer.vue'
+// import MapContainer from '@/components/MapContainer.vue'
 import { EnvironmentOutlined } from '@ant-design/icons-vue'
 
 const columns = [
