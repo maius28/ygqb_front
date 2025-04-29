@@ -12,9 +12,9 @@ export interface IntelData {
   createdAt: string
   //   卫星编号
   satelliteId: string
+  //  经纬度
+  lnglat: string
 }
-
-export type IntelDataList = IntelData[]
 
 // 机构数据结构
 export interface Agent {
