@@ -6,7 +6,7 @@
       <IntelDataTable />
     </a-col>
     <a-col :span="14">
-      <MapContainer />
+      <DefaultMapContainer />
     </a-col>
     <a-col :span="4">
       <a-divider>机构信息</a-divider>
@@ -31,7 +31,8 @@
 </template>
 
 <script lang="ts" setup name="IntelDataView">
-import MapContainer from '@/components/MapContainer.vue'
+// import MapContainer from '@/components/MapContainer.vue'
+import DefaultMapContainer from '@/components/DefaultMapContainer.vue'
 import IntelDataTable from '@/components/IntelDataTable.vue'
 import { EnvironmentOutlined } from '@ant-design/icons-vue'
 

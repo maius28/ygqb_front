@@ -181,7 +181,7 @@ onMounted(() => {
   AMapLoader.load({
     key: 'a7246ce1dbb1a3f8e9488bb6e9d2d02d',
     version: '2.0',
-    plugins: ['AMap.Scale', 'AMap.ToolBar', 'AMap.DistrictLayer', 'Loca'],
+    plugins: ['AMap.Scale', 'Loca'],
     Loca: {
       version: '2.0.0',
     },
@@ -189,12 +189,16 @@ onMounted(() => {
     .then((AMapInstance) => {
       AMap = AMapInstance
       map = new AMap.Map('container', {
-        zoom: 4.3,
+        zoom: 5.0,
         center: [109.595668, 35.447184],
-        showLabel: false,
+        showLabel: true, //是否显示标签
         viewMode: '3D',
-        mapStyle: 'amap://styles/dark',
+        // mapStyle: 'amap://styles/dark', // 暗色风格
       })
+
+
+      var layer1 = new AMap.TileLayer.Satellite(); //卫星图层
+      map.add(layer1)
 
       let loca = new Loca.Container({
         map,
@@ -223,7 +227,8 @@ onMounted(() => {
 
       // 情报呼吸点层，显示情报地点
       let intelDataLayer = new Loca.ScatterLayer({
-        zIndex: 121,
+        zIndex: 200,
+        opacity: 100,
       })
 
       intelDataLayer.setSource(
@@ -238,12 +243,125 @@ onMounted(() => {
         texture: 'https://a.amap.com/Loca/static/loca-v2/demos/images/breath_red.png',
         animate: true,
         duration: 1000,
+        clickable: true,
+      })
+
+      // 添加点击事件
+      intelDataLayer.on('click', (ev) => {
+        const feature = ev.feature
+        if (feature) {
+          const properties = feature.properties
+          console.log('点击的情报点信息:', properties)
+          selectedPoint.value = properties // 更新选中的点
+        }
+      })
+
+      // 弧线层，用于显示机构和情报点之间的连线
+      let pulseLink = new Loca.PulseLinkLayer({
+        zIndex: 10,
+        opacity: 1,
+        visible: true,
+        zooms: [2, 22],
+        depth: true
+      })
+
+      pulseLink.setSource(
+        new Loca.GeoJSONSource({
+          data: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: [
+                    mockIntelData.features[0].geometry.coordinates,
+                    mockAgentData.features[0].geometry.coordinates,
+                  ],
+                },
+              },
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: [
+                    mockIntelData.features[0].geometry.coordinates,
+                    mockAgentData.features[1].geometry.coordinates,
+                  ],
+                },
+              },
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: [
+                    mockIntelData.features[0].geometry.coordinates,
+                    mockAgentData.features[2].geometry.coordinates,
+                  ],
+                },
+              },
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: [
+                    mockIntelData.features[0].geometry.coordinates,
+                    mockAgentData.features[3].geometry.coordinates,
+                  ],
+                },
+              },
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: [
+                    mockIntelData.features[0].geometry.coordinates,
+                    mockAgentData.features[4].geometry.coordinates,
+                  ],
+                },
+              },
+            ],
+          },
+        })
+      )
+
+      pulseLink.setStyle({
+        unit: 'meter',
+        dash: [40000, 0, 40000, 0],
+        lineWidth: function () {
+          return [20000, 1000];
+        },
+        height: function (index, feat) {
+          return feat.distance / 3 + 10;
+        },
+        // altitude: 1000,
+        smoothSteps: 30,
+        speed: function (index, prop) {
+          return 1000 + Math.random() * 200000;
+        },
+        flowLength: 100000,
+        lineColors: function (index, feat) {
+          return ['rgb(255,228,105)', 'rgb(255,164,105)', 'rgba(1, 34, 249,1)'];
+        },
+        maxHeightScale: 0.3, // 弧顶位置比例
+        headColor: 'rgba(255, 255, 0, 1)',
+        trailColor: 'rgba(255, 255,0,0)',
       })
 
       loca.add(agentLayer)
       loca.add(intelDataLayer)
+      loca.add(pulseLink)
 
       loca.animate.start()
+
+      console.log(intelDataLayer)
+      console.log(agentLayer)
+      console.log(pulseLink)
     })
     .catch((e) => {
       console.log(e)
